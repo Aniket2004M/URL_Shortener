@@ -10,13 +10,21 @@ function App() {
   const [chartData, setChartData] = useState([]);
 
   useEffect(() => {
-    // Initial fetch for mock data
-    setUrls(mockUrls);
+    // Load URLs from localStorage, fallback to mock data
+    const storedUrls = localStorage.getItem('shortenedUrls');
+    if (storedUrls) {
+      setUrls(JSON.parse(storedUrls));
+    } else {
+      setUrls(mockUrls);
+      localStorage.setItem('shortenedUrls', JSON.stringify(mockUrls));
+    }
     setChartData(mockChartData);
   }, []);
 
   const handleUrlAdded = (newUrl) => {
-    setUrls([newUrl, ...urls]);
+    const updatedUrls = [newUrl, ...urls];
+    setUrls(updatedUrls);
+    localStorage.setItem('shortenedUrls', JSON.stringify(updatedUrls));
     // Simulate real-time data change for demo
     setChartData((prev) => {
       const newData = [...prev];

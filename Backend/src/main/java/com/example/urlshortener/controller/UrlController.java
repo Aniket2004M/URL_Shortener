@@ -16,18 +16,23 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5174")
 public class UrlController {
 
     private final UrlShortenerService urlShortenerService;
 
     @PostMapping("/shorten")
     public ResponseEntity<String> shortenUrl(@RequestBody ShortenRequest request) {
-        if (request.getOriginalUrl() == null || request.getOriginalUrl().isEmpty()) {
+        String originalUrl = request.getOriginalUrl();
+        if (originalUrl == null || originalUrl.isEmpty()) {
             return ResponseEntity.badRequest().body("originalUrl cannot be empty");
         }
 
-        String shortCode = urlShortenerService.shortenUrl(request.getOriginalUrl());
+        if (!originalUrl.startsWith("http://") && !originalUrl.startsWith("https://")) {
+            originalUrl = "https://" + originalUrl;
+        }
+
+        String shortCode = urlShortenerService.shortenUrl(originalUrl);
         return ResponseEntity.ok(shortCode);
     }
 
