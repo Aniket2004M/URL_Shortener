@@ -15,8 +15,15 @@ const UrlShortenerForm = ({ onUrlAdded }) => {
     setError('');
 
     try {
-      const response = await axios.post('http://localhost:8080/api/url/shorten', { url: originalUrl });
-      onUrlAdded(response.data);
+      const response = await axios.post('http://localhost:8080/shorten', { originalUrl: originalUrl });
+      const newUrl = {
+        id: Date.now(),
+        shortCode: response.data,
+        originalUrl: originalUrl,
+        createdAt: new Date().toISOString(),
+        clicks: 0
+      };
+      onUrlAdded(newUrl);
       setOriginalUrl('');
     } catch (err) {
       console.warn('Backend API failed, falling back to mock behavior.', err);

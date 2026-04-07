@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.Optional;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:5173")
 public class UrlController {
 
     private final UrlShortenerService urlShortenerService;
@@ -24,7 +26,7 @@ public class UrlController {
         if (request.getOriginalUrl() == null || request.getOriginalUrl().isEmpty()) {
             return ResponseEntity.badRequest().body("originalUrl cannot be empty");
         }
-        
+
         String shortCode = urlShortenerService.shortenUrl(request.getOriginalUrl());
         return ResponseEntity.ok(shortCode);
     }
@@ -32,9 +34,9 @@ public class UrlController {
     @GetMapping("/{code}")
     public ResponseEntity<Void> redirectToOriginalUrl(@PathVariable String code, HttpServletRequest request) {
         String referrer = request.getHeader(HttpHeaders.REFERER);
-        
+
         Optional<Url> urlOpt = urlShortenerService.getOriginalUrlAndRecordClick(code, referrer);
-        
+
         if (urlOpt.isPresent()) {
             return ResponseEntity.status(HttpStatus.FOUND) // 302 Redirect
                     .location(URI.create(urlOpt.get().getOriginalUrl()))
